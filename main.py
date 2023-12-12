@@ -20,16 +20,27 @@ class Phone(Field):
     @staticmethod
     def validate_phone(value):
         return len(value) == 10 and value.isdigit()
+    def __setitem__(self, key, value):
+        if key == 'value':
+            if not self.validate_phone(value):
+                raise ValueError("Invalid phone number format")
+            self.value = value
+        else:
+            raise KeyError("Invalid key")
+
+    def __getitem__(self, key):
+        if key == 'value':
+            return self.value
+        else:
+            raise KeyError("Invalid key")
+
 
 class Birthday(Field):
     def __init__(self, value=None):
         if value and not self.validate_birthday(value):
             raise ValueError("Invalid birthday format")
         super().__init__(value)
-    def set_value(self, value):
-        if value and not self.validate_birthday(value):
-            raise ValueError("Invalid birthday format")
-        super().set_value(value)
+
     @staticmethod
     def validate_birthday(value):
         try:
@@ -37,6 +48,20 @@ class Birthday(Field):
             return True
         except ValueError:
             return False
+
+    def __setitem__(self, key, value):
+        if key == 'value':
+            if not self.validate_birthday(value):
+                raise ValueError("Invalid birthday format")
+            self.value = value
+        else:
+            raise KeyError("Invalid key")
+
+    def __getitem__(self, key):
+        if key == 'value':
+            return self.value
+        else:
+            raise KeyError("Invalid key")
 
     def days_to_birthday(self):
         if self.value:
