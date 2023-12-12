@@ -20,6 +20,7 @@ class Phone(Field):
     @staticmethod
     def validate_phone(value):
         return len(value) == 10 and value.isdigit()
+
     def __setitem__(self, key, value):
         if key == 'value':
             if not self.validate_phone(value):
