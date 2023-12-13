@@ -2,71 +2,51 @@ from collections import UserDict
 from datetime import datetime, timedelta
 class Field:
     def __init__(self, value):
-        self.value = value
+        self._value = value
 
-    def __str__(self):
-        return str(self.value)
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, new_value):
+        self._value = new_value
 
 class Name(Field):
     def __init__(self, value):
         super().__init__(value)
 
 class Phone(Field):
-    def __init__(self, value):
-        if not self.validate_phone(value):
-            raise ValueError("Invalid phone number format")
-        super().__init__(value)
-
     @staticmethod
     def validate_phone(value):
         return len(value) == 10 and value.isdigit()
 
-    def __setitem__(self, key, value):
-        if key == 'value':
-            if not self.validate_phone(value):
-                raise ValueError("Invalid phone number format")
-            self.value = value
-        else:
-            raise KeyError("Invalid key")
+    @property
+    def value(self):
+        return self._value
 
-    def __getitem__(self, key):
-        if key == 'value':
-            return self.value
-        else:
-            raise KeyError("Invalid key")
-
+    @value.setter
+    def value(self, new_value):
+        if not self.validate_phone(new_value):
+            raise ValueError("Invalid phone number format")
+        self._value = new_value
 
 class Birthday(Field):
-    def __init__(self, value=None):
-        if value and not self.validate_birthday(value):
-            raise ValueError("Invalid birthday format")
-        super().__init__(value)
+    @property
+    def value(self):
+        return self._value
 
-    @staticmethod
-    def validate_birthday(value):
+    @value.setter
+    def value(self, new_value):
         try:
-            datetime.strptime(value, '%Y-%m-%d')
-            return True
+            datetime.strptime(new_value, '%Y-%m-%d')
         except ValueError:
-            return False
-
-    def __setitem__(self, key, value):
-        if key == 'value':
-            if not self.validate_birthday(value):
-                raise ValueError("Invalid birthday format")
-            self.value = value
-        else:
-            raise KeyError("Invalid key")
-
-    def __getitem__(self, key):
-        if key == 'value':
-            return self.value
-        else:
-            raise KeyError("Invalid key")
+            raise ValueError("Invalid birthday format")
+        self._value = new_value
 
     def days_to_birthday(self):
-        if self.value:
-            dob = datetime.strptime(self.value, '%Y-%m-%d')
+        if self._value:
+            dob = datetime.strptime(self._value, '%Y-%m-%d')
             today = datetime.now()
             next_birthday = datetime(today.year, dob.month, dob.day)
             if today > next_birthday:
